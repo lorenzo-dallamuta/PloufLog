@@ -31,4 +31,31 @@ describe('AsyncStorageDataStore', () => {
       expect(AsyncStorage.getItem).toHaveBeenCalledWith(SPOTS_STORAGE_KEY);
     });
   });
+
+  describe('getDiveSite', () => {
+    it('returns null when no data', async () => {
+      (AsyncStorage.getItem as jest.Mock).mockResolvedValue(null);
+      const diveSite = await dataStore.getDiveSite('123456');
+      expect(diveSite).toEqual(null);
+      expect(AsyncStorage.getItem).toHaveBeenCalledWith(SPOTS_STORAGE_KEY);
+    });
+
+    it('returns null when no match', async () => {
+      const modifiedDiveSite: DiveSite = JSON.parse(JSON.stringify(mockDiveSite));
+      modifiedDiveSite.data.properties.id = '123456';
+      const mockDiveSites: DiveSite[] = [mockDiveSite];
+      (AsyncStorage.getItem as jest.Mock).mockResolvedValue(JSON.stringify(mockDiveSites));
+      const diveSite = await dataStore.getDiveSite('654321');
+      expect(diveSite).toEqual(null);
+      expect(AsyncStorage.getItem).toHaveBeenCalledWith(SPOTS_STORAGE_KEY);
+    });
+
+    it('returns parsed diveSite when match exists', async () => {
+      const mockDiveSites: DiveSite[] = [mockDiveSite];
+      (AsyncStorage.getItem as jest.Mock).mockResolvedValue(JSON.stringify(mockDiveSites));
+      const diveSite = await dataStore.getDiveSite(mockDiveSite.data.properties.id);
+      expect(diveSite).toEqual(mockDiveSite);
+      expect(AsyncStorage.getItem).toHaveBeenCalledWith(SPOTS_STORAGE_KEY);
+    });
+  });
 });
