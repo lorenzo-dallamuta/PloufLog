@@ -41,4 +41,26 @@ describe('useDiveSiteStore', () => {
       expect(newState.diveSites).toEqual(mockDiveSites);
     });
   });
+
+  describe('loadDiveSites action', () => {
+    it('should load diveSite and update state correctly', async () => {
+      // Mock AsyncStorage.getItem to resolve with mockDiveSites
+      mockedAsyncStorage.getItem.mockResolvedValue(JSON.stringify(mockDiveSites));
+
+      // Get and verify the initial state
+      const state = useDiveSiteStore.getState();
+      expect(state.diveSite).toEqual(null);
+      expect(state.isLoading).toBe(false);
+
+      await state.actions.loadDiveSite(mockDiveSites[0].data.properties.id);
+
+      // Verify AsyncStorage was called correctly
+      expect(mockedAsyncStorage.getItem).toHaveBeenCalledWith(SPOTS_STORAGE_KEY);
+      
+      // Get and verify the state after loading
+      const newState = useDiveSiteStore.getState();
+      expect(newState.isLoading).toBe(false);
+      expect(newState.diveSite).toEqual(mockDiveSites[0]);
+    });
+  });
 });
