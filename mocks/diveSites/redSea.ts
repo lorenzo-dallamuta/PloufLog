@@ -1,4 +1,4 @@
-const response = {
+const response: DiveSiteResponse = {
   "stats": {
     "total": 489
   },
