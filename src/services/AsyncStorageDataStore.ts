@@ -10,6 +10,7 @@ export class AsyncStorageDataStore implements IDataStore {
   }
 
   async getDiveSite(id: string): Promise<DiveSite | null> {
-    return null
+    const diveSites = await this.getDiveSites();
+    return diveSites.find(diveSite => diveSite.data.properties.id === id) || null;
   }
 }
