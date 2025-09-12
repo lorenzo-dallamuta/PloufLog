@@ -1,5 +1,6 @@
-import { AsyncStorageDataStore } from '@/src/services/AsyncStorageDataStore';
+import { create } from 'mutative';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { AsyncStorageDataStore } from '@/src/services/AsyncStorageDataStore';
 
 import { SPOTS_STORAGE_KEY } from '@/constants/Store';
 
@@ -41,9 +42,10 @@ describe('AsyncStorageDataStore', () => {
     });
 
     it('returns null when no match', async () => {
-      const modifiedDiveSite: DiveSite = JSON.parse(JSON.stringify(mockDiveSite));
-      modifiedDiveSite.data.properties.id = '123456';
-      const mockDiveSites: DiveSite[] = [mockDiveSite];
+      const modifiedDiveSite: DiveSite = create(mockDiveSite, draft => {
+        draft.data.properties.id = '123456';
+      });
+      const mockDiveSites: DiveSite[] = [modifiedDiveSite];
       (AsyncStorage.getItem as jest.Mock).mockResolvedValue(JSON.stringify(mockDiveSites));
       const diveSite = await dataStore.getDiveSite('654321');
       expect(diveSite).toEqual(null);
