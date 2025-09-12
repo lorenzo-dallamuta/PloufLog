@@ -30,7 +30,8 @@ export const useDiveSiteStore = create<DiveSiteStore>((set, get) => ({
 
     loadDiveSite: async (id: string) => {
       set({ isLoading: true });
-      set({ isLoading: false });
+      const diveSite = await get().dataStore.getDiveSite(id);
+      set({ diveSite, isLoading: false });
     },
   },
 }));
