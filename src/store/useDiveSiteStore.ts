@@ -21,8 +21,8 @@ export const useDiveSiteStore = create<DiveSiteStore>((set, get) => ({
   actions: {
     loadDiveSites: async () => {
       set({ isLoading: true });
-      // data access logic goes here
-      set({ isLoading: false });
+      const diveSites = await get().dataStore.getDiveSites();
+      set({ diveSites, isLoading: false });
     },
   },
 }));
