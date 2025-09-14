@@ -1,11 +1,13 @@
 import { create } from 'mutative';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { AsyncStorageDataStore } from '@/src/services/AsyncStorageDataStore';
+import { getRandomArrayElements } from '@/src/utils/getRandomArrayElements';
 
 import { SPOTS_STORAGE_KEY } from '@/constants/Store';
 
 import redSeaMock from "@/mocks/diveSites/redSea"
 
+const mockDiveSites: DiveSite[] = getRandomArrayElements(redSeaMock.result.elements, 100);
 const mockDiveSite: DiveSite = redSeaMock.result.elements[0];
 const mockDiveSiteWIthNullId: DiveSiteWithNullId = {
   ...mockDiveSite,
@@ -153,6 +155,27 @@ describe('AsyncStorageDataStore', () => {
 
       // Verify that setItem was never called (no data was saved)
       expect(AsyncStorage.setItem).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('deleteDiveSite', () => {
+    it('deletes a diveSite when amatch exists', async () => {
+      (AsyncStorage.getItem as jest.Mock).mockResolvedValue(JSON.stringify(mockDiveSites));
+
+      const diveSiteToDelete = getRandomArrayElements(mockDiveSites, 1)[0];
+
+      await dataStore.deleteDiveSite(diveSiteToDelete.data.properties.id);
+
+      const setItemCalls = (AsyncStorage.setItem as jest.Mock).mock.calls;
+      const [key, value] = setItemCalls[0];
+      const savedData = JSON.parse(value);
+
+      expect(key).toBe(SPOTS_STORAGE_KEY);
+      expect(savedData).toContainEqual(
+        expect.not.objectContaining({
+          ...diveSiteToDelete,
+        })
+      );
     });
   });
 });
