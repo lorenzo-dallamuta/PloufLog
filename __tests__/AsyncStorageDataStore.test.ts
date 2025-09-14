@@ -18,6 +18,12 @@ const mockDiveSiteWIthNullId: DiveSiteWithNullId = {
   }
 };
 
+// Mock ID generator utility used in saveDiveSite for better test consistency
+// Pls, feel free to switch to dependency injection, I'm fine with encapsulation
+jest.mock('@/src/services/DataStore', () => ({
+  generateId: () => 'mock-generated-id-123'
+}));
+
 describe('AsyncStorageDataStore', () => {
   let dataStore: AsyncStorageDataStore;
 
@@ -126,6 +132,27 @@ describe('AsyncStorageDataStore', () => {
           }
         })
       );
+    });
+
+    it('should throw an error when saving a dive site with ID not in storage', async () => {
+      const diveSiteWithNonExistentId: DiveSite = {
+        ...mockDiveSite,
+        data: {
+          ...mockDiveSite.data,
+          properties: {
+            ...mockDiveSite.data.properties,
+            id: 'non-existent-id', // This ID won't be found
+          }
+        }
+      };
+
+      // Verify that an error with the correct message is thrown
+      await expect(dataStore.saveDiveSite(diveSiteWithNonExistentId))
+        .rejects
+        .toThrow('The provided dive site ID does not exist, provide either an existing ID or the value \'null\'');
+
+      // Verify that setItem was never called (no data was saved)
+      expect(AsyncStorage.setItem).not.toHaveBeenCalled();
     });
   });
 });
