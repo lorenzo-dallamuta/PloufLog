@@ -28,7 +28,7 @@ export class AsyncStorageDataStore implements IDataStore {
         id = diveSite.data.properties.id;
         diveSites[index] = diveSite;
       } else {
-        diveSites.push(diveSite); // This shouldn't normally happen, but a fallback
+        throw new Error('The provided dive site ID does not exist, provide either an existing ID or the value \'null\'');
       }
     } else {
       id = generateId();
