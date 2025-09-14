@@ -46,6 +46,10 @@ export class AsyncStorageDataStore implements IDataStore {
   }
 
   async deleteDiveSite(id: string): Promise<void> {
-    return;
+    const diveSites = await this.getDiveSites();
+    // Filter out the diveSite with the matching id
+    const filteredDiveSites = diveSites.filter(diveSite => diveSite.data.properties.id !== id);
+    const jsonValue = JSON.stringify(filteredDiveSites);
+    await AsyncStorage.setItem(SPOTS_STORAGE_KEY, jsonValue);
   }
 }
