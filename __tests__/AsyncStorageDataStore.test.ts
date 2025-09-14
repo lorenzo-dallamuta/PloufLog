@@ -73,7 +73,6 @@ describe('AsyncStorageDataStore', () => {
 
   describe('saveDiveSite', () => {
     it('creates new diveSite when no match exists', async () => {
-      const mockDiveSites: DiveSite[] = [mockDiveSite];
       const newId = await dataStore.saveDiveSite(mockDiveSiteWIthNullId); // the id property will be a new string value
       expect(typeof newId).toBe('string');
 
@@ -93,6 +92,36 @@ describe('AsyncStorageDataStore', () => {
             properties: expect.objectContaining({
               ...mockDiveSiteWIthNullId.data.properties,
               id: newId // Verify the inserted ID is the one that was returned
+            })
+          }
+        })
+      );
+    });
+
+    it('updates existing diveSite when match exists', async () => {
+      const newName = 'TEST_DIVE_SITE_NAME';
+      const newDiveSite = create(mockDiveSite, draft => {
+        draft.data.properties.name = newName;
+      });
+      const id = await dataStore.saveDiveSite(newDiveSite);
+      expect(typeof id).toBe('string');
+
+      expect(AsyncStorage.setItem).toHaveBeenCalledTimes(1);
+
+      const setItemCalls = (AsyncStorage.setItem as jest.Mock).mock.calls;
+      const [key, value] = setItemCalls[0];
+      expect(key).toBe(SPOTS_STORAGE_KEY);
+
+      const savedData = JSON.parse(value);
+
+      expect(savedData).toContainEqual(
+        expect.objectContaining({
+          ...newDiveSite,
+          data: {
+            ...newDiveSite.data,
+            properties: expect.objectContaining({
+              ...newDiveSite.data.properties,
+              name: newName
             })
           }
         })
