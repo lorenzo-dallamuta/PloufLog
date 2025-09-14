@@ -1,7 +1,10 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { IDataStore, generateId } from '@/src/services/DataStore';
-import { SPOTS_STORAGE_KEY } from '@/constants/Store';
 import { create } from 'mutative';
+
+import { IDataStore, generateId } from '@/src/services/DataStore';
+
+import { SPOTS_STORAGE_KEY } from '@/constants/Store';
+import { IsDiveSiteWithNullId } from '@/src/types/assertions';
 
 export class AsyncStorageDataStore implements IDataStore {
   async getDiveSites(): Promise<DiveSite[]> {
@@ -15,6 +18,30 @@ export class AsyncStorageDataStore implements IDataStore {
   }
 
   async saveDiveSite(diveSite: DiveSite | DiveSiteWithNullId): Promise<string | null> {
-    return null;
+    const diveSites = await this.getDiveSites();
+
+    let id: string = "";
+    // If the diveSite exists we need to update it.
+    if (!IsDiveSiteWithNullId(diveSite)) {
+      const index = diveSites.findIndex(d => d.data.properties.id === diveSite.data.properties.id);
+      if (index > -1) {
+        id = diveSite.data.properties.id;
+        diveSites[index] = diveSite;
+      } else {
+        diveSites.push(diveSite); // This shouldn't normally happen, but a fallback
+      }
+    } else {
+      id = generateId();
+      const newDiveSite = create(
+        diveSite,
+        (draft) => {
+          (draft as unknown as DiveSite).data.properties.id = id;
+        }
+      ) as unknown as DiveSite;
+      diveSites.push(newDiveSite);
+    }
+    
+    await AsyncStorage.setItem(SPOTS_STORAGE_KEY, JSON.stringify(diveSites));
+    return id.length ? id : null;
   }
 }
