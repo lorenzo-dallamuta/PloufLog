@@ -7,6 +7,16 @@ import { SPOTS_STORAGE_KEY } from '@/constants/Store';
 import redSeaMock from "@/mocks/diveSites/redSea"
 
 const mockDiveSite: DiveSite = redSeaMock.result.elements[0];
+const mockDiveSiteWIthNullId: DiveSiteWithNullId = {
+  ...mockDiveSite,
+  data: {
+    ...mockDiveSite.data,
+    properties: {
+      ...mockDiveSite.data.properties,
+      id: null
+    }
+  }
+};
 
 describe('AsyncStorageDataStore', () => {
   let dataStore: AsyncStorageDataStore;
@@ -64,11 +74,7 @@ describe('AsyncStorageDataStore', () => {
   describe('saveDiveSite', () => {
     it('creates new diveSite when no match exists', async () => {
       const mockDiveSites: DiveSite[] = [mockDiveSite];
-      const newDiveSite: DiveSite = create(mockDiveSite, draft => {
-        draft.data.properties.id = null;
-        draft.data.properties.name = 'TESTING SAVE SITE'
-      });
-      const newId = await dataStore.saveDiveSite(newDiveSite); // the id property will be a new string value
+      const newId = await dataStore.saveDiveSite(mockDiveSiteWIthNullId); // the id property will be a new string value
       expect(typeof newId).toBe('string');
 
       expect(AsyncStorage.setItem).toHaveBeenCalledTimes(1);
@@ -81,11 +87,11 @@ describe('AsyncStorageDataStore', () => {
 
       expect(savedData).toContainEqual(
         expect.objectContaining({
-          ...newDiveSite,
+          ...mockDiveSiteWIthNullId,
           data: {
-            ...newDiveSite.data,
+            ...mockDiveSiteWIthNullId.data,
             properties: expect.objectContaining({
-              ...newDiveSite.data.properties,
+              ...mockDiveSiteWIthNullId.data.properties,
               id: newId // Verify the inserted ID is the one that was returned
             })
           }

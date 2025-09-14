@@ -42,6 +42,14 @@ type DiveSite = {
   };
 }
 
+type DiveSiteWithNullId = Omit<DiveSite, 'data'> & {
+  data: Omit<DiveSite['data'], 'properties'> & {
+    properties: Omit<DiveSite['data']['properties'], 'id'> & {
+      id: null;
+    }
+  }
+};
+
 type DiveSiteResponse = {
   stats: {
     total: number;
