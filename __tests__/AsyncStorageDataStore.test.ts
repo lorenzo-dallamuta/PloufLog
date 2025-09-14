@@ -60,4 +60,37 @@ describe('AsyncStorageDataStore', () => {
       expect(AsyncStorage.getItem).toHaveBeenCalledWith(SPOTS_STORAGE_KEY);
     });
   });
+
+  describe('saveDiveSite', () => {
+    it('creates new diveSite when no match exists', async () => {
+      const mockDiveSites: DiveSite[] = [mockDiveSite];
+      const newDiveSite: DiveSite = create(mockDiveSite, draft => {
+        draft.data.properties.id = null;
+        draft.data.properties.name = 'TESTING SAVE SITE'
+      });
+      const newId = await dataStore.saveDiveSite(newDiveSite); // the id property will be a new string value
+      expect(typeof newId).toBe('string');
+
+      expect(AsyncStorage.setItem).toHaveBeenCalledTimes(1);
+
+      const setItemCalls = (AsyncStorage.setItem as jest.Mock).mock.calls;
+      const [key, value] = setItemCalls[0];
+      expect(key).toBe(SPOTS_STORAGE_KEY);
+
+      const savedData = JSON.parse(value);
+
+      expect(savedData).toContainEqual(
+        expect.objectContaining({
+          ...newDiveSite,
+          data: {
+            ...newDiveSite.data,
+            properties: expect.objectContaining({
+              ...newDiveSite.data.properties,
+              id: newId // Verify the inserted ID is the one that was returned
+            })
+          }
+        })
+      );
+    });
+  });
 });
