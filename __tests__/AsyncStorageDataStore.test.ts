@@ -1,6 +1,7 @@
 import { create } from 'mutative';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { AsyncStorageDataStore } from '@/src/services/AsyncStorageDataStore';
+import { generateId } from '@/src/services/DataStore';
 import { getRandomArrayElements } from '@/src/utils/getRandomArrayElements';
 
 import { SPOTS_STORAGE_KEY } from '@/constants/Store';
@@ -176,6 +177,20 @@ describe('AsyncStorageDataStore', () => {
           ...diveSiteToDelete,
         })
       );
+    });
+
+    it('throws an error when a match does not exists', async () => {
+      (AsyncStorage.getItem as jest.Mock).mockResolvedValue(JSON.stringify(mockDiveSites));
+
+      const diveSiteToDeleteIdx = generateId();
+
+      // Verify that an error with the correct message is thrown
+      await expect(dataStore.deleteDiveSite(diveSiteToDeleteIdx))
+        .rejects
+        .toThrow('The provided dive site ID does not exist, provide an existing ID');
+
+      // Verify that setItem was never called (no data was saved)
+      expect(AsyncStorage.setItem).not.toHaveBeenCalled();
     });
   });
 });

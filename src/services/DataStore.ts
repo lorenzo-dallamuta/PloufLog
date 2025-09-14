@@ -2,6 +2,7 @@ export interface IDataStore {
   getDiveSites(): Promise<DiveSite[]>;
   getDiveSite(id: string): Promise<DiveSite | null>;
   saveDiveSite(site: DiveSite): Promise<string | null>;
+  deleteDiveSite(id: string): Promise<void>;
 }
 
 // This is necessary for the AsyncStorage implementation.
