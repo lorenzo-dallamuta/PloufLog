@@ -17,10 +17,10 @@ export class AsyncStorageDataStore implements IDataStore {
     return diveSites.find(diveSite => diveSite.data.properties.id === id) || null;
   }
 
-  async saveDiveSite(diveSite: DiveSite | DiveSiteWithNullId): Promise<string | null> {
+  async saveDiveSite(diveSite: DiveSite | DiveSiteWithNullId): Promise<string> {
     const diveSites = await this.getDiveSites();
 
-    let id: string = "";
+    let id: string;
     // If the diveSite exists we need to update it.
     if (!IsDiveSiteWithNullId(diveSite)) {
       const index = diveSites.findIndex(d => d.data.properties.id === diveSite.data.properties.id);
@@ -42,7 +42,8 @@ export class AsyncStorageDataStore implements IDataStore {
     }
     
     await AsyncStorage.setItem(SPOTS_STORAGE_KEY, JSON.stringify(diveSites));
-    return id.length ? id : null;
+
+    return id;
   }
 
   async deleteDiveSite(id: string): Promise<void> {

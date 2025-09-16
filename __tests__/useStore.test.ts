@@ -13,6 +13,12 @@ const mockDiveSites: DiveSite[] = getRandomArrayElements(redSeaMock.result.eleme
 // Get the typed mocked instance
 const mockedAsyncStorage = AsyncStorage as jest.Mocked<typeof AsyncStorage>;
 
+// Mock ID generator utility used in saveDiveSite for better test consistency
+// Pls, feel free to switch to dependency injection, I'm fine with encapsulation
+jest.mock('@/src/services/DataStore', () => ({
+  generateId: () => 'mock-generated-id-123'
+}));
+
 describe('useDiveSiteStore', () => {
   beforeEach(() => {
     // Clear all mocks before each test
@@ -61,6 +67,54 @@ describe('useDiveSiteStore', () => {
       const newState = useDiveSiteStore.getState();
       expect(newState.isLoading).toBe(false);
       expect(newState.diveSite).toEqual(mockDiveSites[0]);
+    });
+  });
+
+  describe('addDiveSite action', () => {
+    it('should save a new dive site and update state', async () => {
+      // Declare all mocks required only for the current test
+      const newSite = {
+        ...mockDiveSites[0],
+        data: {
+          ...mockDiveSites[0].data,
+          properties: {
+            ...mockDiveSites[0].data.properties,
+            id: null
+          }
+        }
+      };
+      const expectedSite = {
+        ...newSite,
+        data: {
+          ...newSite.data,
+          properties: {
+            ...newSite.data.properties,
+            id: 'mock-generated-id-123'
+          }
+        }
+      };
+      const expectedArray = [expectedSite];
+
+      // Sequence getItem mocks for the three calls in addDiveSite
+      mockedAsyncStorage.getItem
+        .mockResolvedValueOnce(JSON.stringify([])) // First call in saveDiveSite
+        .mockResolvedValueOnce(JSON.stringify(expectedArray)) // Second call in getDiveSites
+        .mockResolvedValueOnce(JSON.stringify(expectedArray)); // Third call in getDiveSite
+
+      // Invoke the action
+      await useDiveSiteStore.getState().actions.addDiveSite(newSite);
+
+      // Verify setItem was called with the expected data
+      expect(mockedAsyncStorage.setItem).toHaveBeenCalledWith(
+        SPOTS_STORAGE_KEY,
+        JSON.stringify(expectedArray)
+      );
+
+      // Verify Zustand state was updated correctly (depends on the sequential mocks above)
+      const state = useDiveSiteStore.getState();
+      expect(state.diveSites).toEqual(expectedArray);
+      expect(state.diveSite).toEqual(expectedSite);
+      expect(state.isLoading).toBe(false);
     });
   });
 });
