@@ -23,7 +23,10 @@ describe('useDiveSiteStore', () => {
   beforeEach(() => {
     // Clear all mocks before each test
     jest.clearAllMocks();
-    // Add a reset action to your store if needed
+    // Clear react-native-async-storage mock before each test
+    mockedAsyncStorage.getItem.mockResolvedValue(JSON.stringify([]));
+    // Add a reset action to your store
+    useDiveSiteStore.getState().actions.removeAllDiveSites();
   });
 
   describe('loadDiveSites action', () => {
