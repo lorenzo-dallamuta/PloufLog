@@ -45,7 +45,12 @@ export const useDiveSiteStore = create<DiveSiteStore>((set, get) => ({
       set({ diveSites, diveSite, isLoading: false });
     },
 
-    removeDiveSite: async (id: string) => {},
+    removeDiveSite: async (id: string) => {
+      set({ isLoading: true });
+      await get().dataStore.deleteDiveSite(id);
+      const diveSites = await get().dataStore.getDiveSites();
+      set({ diveSites, diveSite: null, isLoading: false });
+    },
 
     removeAllDiveSites: async () => {
       // TODO: add logic to clear main data layer (react async storage) as well
