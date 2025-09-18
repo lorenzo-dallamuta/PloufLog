@@ -46,7 +46,13 @@ export const useDiveSiteStore = create<DiveSiteStore>((set, get) => ({
       set({ diveSites, diveSite, isLoading: false });
     },
 
-    updateDiveSite: async (diveSiteData: DiveSite) => {},
+    updateDiveSite: async (diveSiteData: DiveSite) => {
+      set({ isLoading: true });
+      const id = await get().dataStore.saveDiveSite(diveSiteData);
+      const diveSites = await get().dataStore.getDiveSites();
+      const diveSite = await get().dataStore.getDiveSite(id);
+      set({ diveSites, diveSite, isLoading: false });
+    },
 
     removeDiveSite: async (id: string) => {
       set({ isLoading: true });
