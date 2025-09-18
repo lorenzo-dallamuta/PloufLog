@@ -120,4 +120,33 @@ describe('useDiveSiteStore', () => {
       expect(state.isLoading).toBe(false);
     });
   });
+
+  describe('deleteDiveSite action', () => {
+    it('should delete a dive site and update state', async () => {
+      // Declare all mocks required only for the current test
+      const siteToDelete: DiveSite = getRandomArrayElements(mockDiveSites, 1)[0];
+      const siteIdToDelete = siteToDelete.data.properties.id;
+      const expectedArray = mockDiveSites.filter(s => s.data.properties.id !== siteIdToDelete);
+
+      // Setup getItem mocks for the call encapsulated in removeDiveSite
+      mockedAsyncStorage.getItem
+        .mockResolvedValueOnce(JSON.stringify(mockDiveSites)) // First call in deleteDiveSite
+        .mockResolvedValueOnce(JSON.stringify(expectedArray)) // Second call in getDiveSites
+
+      // Invoke the action
+      await useDiveSiteStore.getState().actions.removeDiveSite(siteIdToDelete);
+
+      // Verify setItem was called with the expected data
+      expect(mockedAsyncStorage.setItem).toHaveBeenCalledWith(
+        SPOTS_STORAGE_KEY,
+        JSON.stringify(expectedArray)
+      );
+
+      // Verify Zustand state was updated correctly (depends on the sequential mocks above)
+      const state = useDiveSiteStore.getState();
+      expect(state.diveSites).toEqual(expectedArray);
+      expect(state.diveSite).toEqual(null);
+      expect(state.isLoading).toBe(false);
+    });
+  });
 });
