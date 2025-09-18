@@ -12,6 +12,7 @@ interface DiveSiteStore {
     loadDiveSites: () => Promise<void>;
     loadDiveSite: (id: string) => Promise<void>;
     addDiveSite: (diveSiteData: DiveSiteWithNullId) => Promise<void>
+    updateDiveSite: (diveSiteData: DiveSite) => Promise<void>
     removeDiveSite: (id: string) => Promise<void>
     removeAllDiveSites: () => Promise<void>
   };
@@ -44,6 +45,8 @@ export const useDiveSiteStore = create<DiveSiteStore>((set, get) => ({
       const diveSite = await get().dataStore.getDiveSite(id);
       set({ diveSites, diveSite, isLoading: false });
     },
+
+    updateDiveSite: async (diveSiteData: DiveSite) => {},
 
     removeDiveSite: async (id: string) => {
       set({ isLoading: true });
