@@ -37,8 +37,8 @@ export const useDiveSiteStore = create<DiveSiteStore>((set, get) => ({
 
     addDiveSite: async (diveSiteData: DiveSiteWithNullId) => {
       set({ isLoading: true });
-      const diveSites = await get().dataStore.getDiveSites();
       const id = await get().dataStore.saveDiveSite(diveSiteData);
+      const diveSites = await get().dataStore.getDiveSites();
       const diveSite = await get().dataStore.getDiveSite(id);
       set({ diveSites, diveSite, isLoading: false });
     },
