@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { IDataStore } from '@/src/services/DataStore';
+import { IDataStore, StoreDependencies } from '@/src/services/DataStore';
 import { AsyncStorageDataStore } from '@/src/services/AsyncStorageDataStore';
 
 // Define the shape of our global state
@@ -19,11 +19,11 @@ interface DiveSiteStore {
 }
 
 // Instantiate the concrete data store implementation.
-export const useDiveSiteStore = create<DiveSiteStore>((set, get) => ({
+export const createDiveSiteStore = ({ dataStore }: StoreDependencies) => create<DiveSiteStore>((set, get) => ({
   diveSites: [],
   diveSite: null,
   isLoading: false,
-  dataStore: new AsyncStorageDataStore(), // <-- The magic abstraction line
+  dataStore,
 
   actions: {
     loadDiveSites: async () => {
@@ -67,6 +67,11 @@ export const useDiveSiteStore = create<DiveSiteStore>((set, get) => ({
     },
   },
 }));
+
+// Default store instance for app usage
+export const useDiveSiteStore = createDiveSiteStore({
+  dataStore: new AsyncStorageDataStore() // <-- The magic abstraction line
+});
 
 // Export convenient hooks for selecting state and actions
 export const useDiveSites = () => useDiveSiteStore(state => state.diveSites);

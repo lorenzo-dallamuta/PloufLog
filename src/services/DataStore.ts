@@ -22,6 +22,10 @@ export interface IDataStore {
   deleteDiveSite(id: string): Promise<void>;
 }
 
+export interface StoreDependencies {
+  dataStore: IDataStore;
+}
+
 // This is necessary for the AsyncStorage implementation.
 export function generateId(): string {
   return Date.now().toString(36) + Math.random().toString(36).substring(2);
