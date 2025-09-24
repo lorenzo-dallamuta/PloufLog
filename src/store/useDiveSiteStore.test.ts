@@ -9,24 +9,30 @@ import redSeaMock from "@/mocks/diveSites/redSea"
 const mockDiveSites: DiveSite[] = getRandomArrayElements(redSeaMock.result.elements, 100);
 
 describe('useDiveSiteStore', () => {
+  let mockDataStore: IDataStore;
+  let useTestStore: ReturnType<typeof createDiveSiteStore>;
+
+  const baseMockDataStore: IDataStore = {
+    getDiveSites: jest.fn().mockResolvedValue([]),
+    getDiveSite: jest.fn().mockResolvedValue(null),
+    saveDiveSite: jest.fn().mockResolvedValue('mock-generated-id-123'),
+    deleteDiveSite: jest.fn().mockResolvedValue(undefined)
+  };
+
   beforeEach(() => {
+    // Create fresh mocks for each test
+    mockDataStore = { ...baseMockDataStore };
+    useTestStore = createDiveSiteStore({ dataStore: mockDataStore });
     // Clear all mocks before each test
     jest.clearAllMocks();
   });
 
   describe('loadDiveSites action', () => {
+    beforeEach(() => {
+      mockDataStore.getDiveSites = jest.fn().mockResolvedValue(mockDiveSites);
+    });
+
     it('should load diveSites and update state correctly', async () => {
-      // Create mock data store
-      const mockDataStore: IDataStore = {
-        getDiveSites: jest.fn().mockResolvedValue(mockDiveSites),
-        getDiveSite: jest.fn(),
-        saveDiveSite: jest.fn(),
-        deleteDiveSite: jest.fn()
-      };
-
-      // Create store instance with injected mock
-      const useTestStore = createDiveSiteStore({ dataStore: mockDataStore });
-
       // Get and verify the initial state
       const state = useTestStore.getState();
       expect(state.diveSites).toEqual([]);
@@ -41,37 +47,20 @@ describe('useDiveSiteStore', () => {
     });
 
     it('should call dataStore.getDiveSites with the expected parameters', async () => {
-      const mockGetDiveSites = jest.fn().mockResolvedValue([]);
-      const mockDataStore: IDataStore = {
-        getDiveSites: mockGetDiveSites,
-        getDiveSite: jest.fn(),
-        saveDiveSite: jest.fn(),
-        deleteDiveSite: jest.fn()
-      };
-
-      // Create store instance with injected mock
-      const useTestStore = createDiveSiteStore({ dataStore: mockDataStore });
-
+      // Invoke the action
       await useTestStore.getState().actions.loadDiveSites();
 
-      expect(mockGetDiveSites).toHaveBeenCalledTimes(1);
-      expect(mockGetDiveSites).toHaveBeenCalledWith(); // Verify no parameters
+      expect(mockDataStore.getDiveSites).toHaveBeenCalledTimes(1);
+      expect(mockDataStore.getDiveSites).toHaveBeenCalledWith(); // Verify no parameters
     });
   });
 
   describe('loadDiveSite action', () => {
+    beforeEach(() => {
+      mockDataStore.getDiveSite = jest.fn().mockResolvedValue(mockDiveSites[0]);
+    });
+
     it('should load diveSite and update state correctly', async () => {
-      // Create mock data store
-      const mockDataStore: IDataStore = {
-        getDiveSites: jest.fn(),
-        getDiveSite: jest.fn().mockResolvedValue(mockDiveSites[0]),
-        saveDiveSite: jest.fn(),
-        deleteDiveSite: jest.fn()
-      };
-
-      // Create store instance with injected mock
-      const useTestStore = createDiveSiteStore({ dataStore: mockDataStore });
-
       // Get and verify the initial state
       const state = useTestStore.getState();
       expect(state.diveSite).toEqual(null);
@@ -86,21 +75,11 @@ describe('useDiveSiteStore', () => {
     });
 
     it('should call dataStore.getDiveSite with the expected parameters', async () => {
-      const mockGetDiveSite = jest.fn().mockResolvedValue(mockDiveSites[0]);
-      const mockDataStore: IDataStore = {
-        getDiveSites: jest.fn(),
-        getDiveSite: mockGetDiveSite,
-        saveDiveSite: jest.fn(),
-        deleteDiveSite: jest.fn()
-      };
-
-      // Create store instance with injected mock
-      const useTestStore = createDiveSiteStore({ dataStore: mockDataStore });
-
+      // Invoke the action
       await useTestStore.getState().actions.loadDiveSite(mockDiveSites[0].data.properties.id);
 
-      expect(mockGetDiveSite).toHaveBeenCalledTimes(1);
-      expect(mockGetDiveSite).toHaveBeenCalledWith(mockDiveSites[0].data.properties.id); // Verify no parameters
+      expect(mockDataStore.getDiveSite).toHaveBeenCalledTimes(1);
+      expect(mockDataStore.getDiveSite).toHaveBeenCalledWith(mockDiveSites[0].data.properties.id); // Verify no parameters
     });
   });
 
@@ -134,18 +113,13 @@ describe('useDiveSiteStore', () => {
       expectedArray = [expectedSite];
     }),
 
+    beforeEach(() => {
+      mockDataStore.getDiveSites = jest.fn().mockResolvedValue(expectedArray);
+      mockDataStore.getDiveSite = jest.fn().mockResolvedValue(expectedSite);
+      mockDataStore.saveDiveSite = jest.fn().mockResolvedValue(expectedSite.data.properties.id);
+    });
+
     it('should save a new dive site and update state', async () => {
-      // Create mock data store
-      const mockDataStore: IDataStore = {
-        getDiveSites: jest.fn().mockResolvedValue(expectedArray),
-        getDiveSite: jest.fn().mockResolvedValue(expectedSite),
-        saveDiveSite: jest.fn(),
-        deleteDiveSite: jest.fn()
-      };
-
-      // Create store instance with injected mock
-      const useTestStore = createDiveSiteStore({ dataStore: mockDataStore });
-
       // Get and verify the initial state
       const state = useTestStore.getState();
       expect(state.diveSite).toEqual(null);
@@ -162,40 +136,28 @@ describe('useDiveSiteStore', () => {
     });
 
     it('should call dataStore.saveDiveSite, dataStore.getDiveSites, dataStore.getDiveSite with the expected parameters', async () => {
-      const mockSaveDiveSite = jest.fn().mockResolvedValue(expectedSite.data.properties.id);
-      const mockGetDiveSites = jest.fn().mockResolvedValue(expectedArray);
-      const mockGetDiveSite = jest.fn().mockResolvedValue(expectedSite);
-      const mockDataStore: IDataStore = {
-        getDiveSites: mockGetDiveSites,
-        getDiveSite: mockGetDiveSite,
-        saveDiveSite: mockSaveDiveSite,
-        deleteDiveSite: jest.fn()
-      };
-
-      // Create store instance with injected mock
-      const useTestStore = createDiveSiteStore({ dataStore: mockDataStore });
-
+      // Invoke the action
       await useTestStore.getState().actions.addDiveSite(newSite);
 
-      expect(mockSaveDiveSite).toHaveBeenCalledTimes(1);
-      expect(mockSaveDiveSite).toHaveBeenCalledWith(newSite);
+      expect(mockDataStore.saveDiveSite).toHaveBeenCalledTimes(1);
+      expect(mockDataStore.saveDiveSite).toHaveBeenCalledWith(newSite);
 
-      expect(mockGetDiveSites).toHaveBeenCalledTimes(1);
-      expect(mockGetDiveSites).toHaveBeenCalledWith();
+      expect(mockDataStore.getDiveSites).toHaveBeenCalledTimes(1);
+      expect(mockDataStore.getDiveSites).toHaveBeenCalledWith(); // Verify no parameters
 
-      expect(mockGetDiveSite).toHaveBeenCalledTimes(1);
-      expect(mockGetDiveSite).toHaveBeenCalledWith(expectedSite.data.properties.id);
+      expect(mockDataStore.getDiveSite).toHaveBeenCalledTimes(1);
+      expect(mockDataStore.getDiveSite).toHaveBeenCalledWith(expectedSite.data.properties.id);
     });
   });
 
   describe('updateDiveSite action', () => {
-    let updatedSite: DiveSite;
+    let expectedSite: DiveSite;
     let expectedArray: DiveSite[];
 
     beforeAll(() => {
       // Declare all mocks required only for the current test suite
       const [first, ...rest] = mockDiveSites;
-      updatedSite = {
+      expectedSite = {
         ...first,
         data: {
           ...first.data,
@@ -205,55 +167,43 @@ describe('useDiveSiteStore', () => {
           }
         }
       };
-      expectedArray = [updatedSite, ...rest];
+      expectedArray = [expectedSite, ...rest];
     }),
 
+    beforeEach(() => {
+      mockDataStore.getDiveSites = jest.fn().mockResolvedValue(expectedArray);
+      mockDataStore.getDiveSite = jest.fn().mockResolvedValue(expectedSite);
+      mockDataStore.saveDiveSite = jest.fn().mockResolvedValue(expectedSite.data.properties.id);
+    });
+
     it('should update an existing dive site and update state', async () => {
-      // Create mock data store
-      const mockDataStore: IDataStore = {
-        getDiveSites: jest.fn().mockResolvedValue(expectedArray),
-        getDiveSite: jest.fn().mockResolvedValue(updatedSite),
-        saveDiveSite: jest.fn(),
-        deleteDiveSite: jest.fn()
-      };
-
-      // Create store instance with injected mock
-      const useTestStore = createDiveSiteStore({ dataStore: mockDataStore });
-
-      // Invoke the action
-      await useTestStore.getState().actions.updateDiveSite(updatedSite);
-
-      // Verify Zustand state was updated correctly (depends on the sequential mocks above)
+      // Get and verify the initial state
       const state = useTestStore.getState();
-      expect(state.diveSites).toEqual(expectedArray);
-      expect(state.diveSite).toEqual(updatedSite);
+      expect(state.diveSites).toEqual([]);
+      expect(state.diveSite).toEqual(null);
       expect(state.isLoading).toBe(false);
+      
+      // Invoke the action
+      await useTestStore.getState().actions.updateDiveSite(expectedSite);
+
+      // Get and verify the state after loading
+      const newstate = useTestStore.getState();
+      expect(newstate.diveSites).toEqual(expectedArray);
+      expect(newstate.diveSite).toEqual(expectedSite);
+      expect(newstate.isLoading).toBe(false);
     });
 
     it('should call dataStore.saveDiveSite, dataStore.getDiveSites, dataStore.getDiveSite with the expected parameters', async () => {
-      const mockSaveDiveSite = jest.fn().mockResolvedValue(updatedSite.data.properties.id);
-      const mockGetDiveSites = jest.fn().mockResolvedValue(expectedArray);
-      const mockGetDiveSite = jest.fn().mockResolvedValue(updatedSite);
-      const mockDataStore: IDataStore = {
-        getDiveSites: mockGetDiveSites,
-        getDiveSite: mockGetDiveSite,
-        saveDiveSite: mockSaveDiveSite,
-        deleteDiveSite: jest.fn()
-      };
+      await useTestStore.getState().actions.updateDiveSite(expectedSite);
 
-      // Create store instance with injected mock
-      const useTestStore = createDiveSiteStore({ dataStore: mockDataStore });
+      expect(mockDataStore.saveDiveSite).toHaveBeenCalledTimes(1);
+      expect(mockDataStore.saveDiveSite).toHaveBeenCalledWith(expectedSite);
 
-      await useTestStore.getState().actions.updateDiveSite(updatedSite);
+      expect(mockDataStore.getDiveSites).toHaveBeenCalledTimes(1);
+      expect(mockDataStore.getDiveSites).toHaveBeenCalledWith(); // Verify no parameters
 
-      expect(mockSaveDiveSite).toHaveBeenCalledTimes(1);
-      expect(mockSaveDiveSite).toHaveBeenCalledWith(updatedSite);
-
-      expect(mockGetDiveSites).toHaveBeenCalledTimes(1);
-      expect(mockGetDiveSites).toHaveBeenCalledWith();
-
-      expect(mockGetDiveSite).toHaveBeenCalledTimes(1);
-      expect(mockGetDiveSite).toHaveBeenCalledWith(updatedSite.data.properties.id);
+      expect(mockDataStore.getDiveSite).toHaveBeenCalledTimes(1);
+      expect(mockDataStore.getDiveSite).toHaveBeenCalledWith(expectedSite.data.properties.id);
     });
   });
 
@@ -267,40 +217,29 @@ describe('useDiveSiteStore', () => {
       expectedArray = mockDiveSites.filter(s => s.data.properties.id !== siteToDelete.data.properties.id);
     });
 
-    it('should delete a dive site and update state', async () => {
-      // Create mock data store
-      const mockDataStore: IDataStore = {
-        getDiveSites: jest.fn().mockResolvedValue(expectedArray),
-        getDiveSite: jest.fn().mockResolvedValue(null),
-        saveDiveSite: jest.fn(),
-        deleteDiveSite: jest.fn()
-      };
+    beforeEach(() => {
+      mockDataStore.deleteDiveSite = jest.fn().mockResolvedValue(undefined);
+      mockDataStore.getDiveSites = jest.fn().mockResolvedValue(expectedArray);
+    });
 
-      // Create store instance with injected mock
-      const useTestStore = createDiveSiteStore({ dataStore: mockDataStore });
+    it('should delete a dive site and update state', async () => {
+      // Get and verify the initial state
+      const state = useTestStore.getState();
+      expect(state.diveSites).toEqual([]);
+      expect(state.diveSite).toEqual(null);
+      expect(state.isLoading).toBe(false);
 
       // Invoke the action
       await useTestStore.getState().actions.removeDiveSite(siteToDelete.data.properties.id);
 
-      // Verify Zustand state was updated correctly (depends on the sequential mocks above)
-      const state = useTestStore.getState();
-      expect(state.diveSites).toEqual(expectedArray);
-      expect(state.diveSite).toEqual(null);
-      expect(state.isLoading).toBe(false);
+      // Get and verify the state after loading
+      const newState = useTestStore.getState();
+      expect(newState.diveSites).toEqual(expectedArray);
+      expect(newState.diveSite).toEqual(null);
+      expect(newState.isLoading).toBe(false);
     });
 
     it('should call dataStore.deleteDiveSite, dataStore.getDiveSites with the expected parameters', async () => {
-      // Create mock data store
-      const mockDataStore: IDataStore = {
-        getDiveSites: jest.fn().mockResolvedValue(expectedArray),
-        getDiveSite: jest.fn().mockResolvedValue(null),
-        saveDiveSite: jest.fn(),
-        deleteDiveSite: jest.fn()
-      };
-
-      // Create store instance with injected mock
-      const useTestStore = createDiveSiteStore({ dataStore: mockDataStore });
-
       // Invoke the action
       await useTestStore.getState().actions.removeDiveSite(siteToDelete.data.properties.id);
 
