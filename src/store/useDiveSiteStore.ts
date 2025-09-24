@@ -14,7 +14,6 @@ interface DiveSiteStore {
     addDiveSite: (diveSiteData: DiveSiteWithNullId) => Promise<void>
     updateDiveSite: (diveSiteData: DiveSite) => Promise<void>
     removeDiveSite: (id: string) => Promise<void>
-    removeAllDiveSites: () => Promise<void>
   };
 }
 
@@ -59,11 +58,6 @@ export const createDiveSiteStore = ({ dataStore }: StoreDependencies) => create<
       await get().dataStore.deleteDiveSite(id);
       const diveSites = await get().dataStore.getDiveSites();
       set({ diveSites, diveSite: null, isLoading: false });
-    },
-
-    removeAllDiveSites: async () => {
-      // TODO: add logic to clear main data layer (react async storage) as well
-      set({ diveSites: [], diveSite: null, isLoading: false });
     },
   },
 }));
