@@ -3,11 +3,12 @@ import SpotListScreen from '@/app/(tabs)/my-spots/index';
 
 // mock the return values of the store selectors, used in the UI components
 jest.mock('@/src/store/useDiveSiteStore', () => ({
+  useDiveSiteList: jest.fn(),
   useDiveSiteIsLoading: jest.fn(),
   useDiveSiteActions: jest.fn(),
 }));
 
-import { useDiveSiteIsLoading, useDiveSiteActions } from '@/src/store/useDiveSiteStore';
+import { useDiveSiteList, useDiveSiteIsLoading, useDiveSiteActions } from '@/src/store/useDiveSiteStore';
 
 
 describe('MySpots - List', () => {
@@ -33,6 +34,38 @@ describe('MySpots - List', () => {
       render(<SpotListScreen />);
       expect(screen.getByRole('progressbar')).toBeVisible();
       expect(screen.getByAccessibilityHint('loading-spinner')).toBeVisible();
+    });
+  });
+
+  describe('the empty state', () => {
+    beforeEach(() => {
+      // Set the mock implementations
+      (useDiveSiteList as jest.Mock).mockReturnValue([]);
+      (useDiveSiteIsLoading as jest.Mock).mockReturnValue(false);
+      (useDiveSiteActions as jest.Mock).mockReturnValue({ loadDiveSites: jest.fn() });
+    });
+
+    it('should display a no results notice', () => {
+      render(<SpotListScreen />);
+      expect(screen.getByTestId('empty-list')).toBeTruthy;
+    });
+
+    it('should display a no results notice that is completely visible', () => {
+      render(<SpotListScreen />);
+      expect(screen.getByTestId('empty-list')).toBeVisible();
+    });
+
+    it('should display a no results notice that has the expected text', () => {
+      render(<SpotListScreen />);
+      expect(screen.getByTestId('empty-list')).toHaveTextContent('Add a dive spot to see it in your list');
+    });
+
+    it('should display a no results notice that has the expected accessibility attributes', () => {
+      render(<SpotListScreen />);
+      const emptyElement = screen.getByTestId('empty-list');
+      expect(emptyElement).toHaveProp('accessible', true);
+      expect(emptyElement).toHaveProp('accessibilityRole', 'text');
+      expect(emptyElement).toHaveProp('accessibilityLabel', 'No dive spots');
     });
   });
 });
