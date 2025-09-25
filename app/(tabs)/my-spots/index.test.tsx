@@ -1,5 +1,14 @@
-import { render, screen } from '@testing-library/react-native';
+import { isInaccessible, render, screen } from '@testing-library/react-native';
 import SpotListScreen from '@/app/(tabs)/my-spots/index';
+
+// mock the return values of the store selectors, used in the UI components
+jest.mock('@/src/store/useDiveSiteStore', () => ({
+  useDiveSiteIsLoading: jest.fn(),
+  useDiveSiteActions: jest.fn(),
+}));
+
+import { useDiveSiteIsLoading, useDiveSiteActions } from '@/src/store/useDiveSiteStore';
+
 
 describe('MySpots - List', () => {
   beforeEach(() => {
@@ -9,11 +18,9 @@ describe('MySpots - List', () => {
 
   describe('loading state', () => {
     beforeEach(() => {
-      // mock the return values of store selectors, used in the UI components
-      jest.mock('@/src/store/useDiveSiteStore', () => ({
-        useDiveSiteIsLoading: () => true,
-        useDiveSiteActions: () => ({ loadDiveSites: jest.fn() }),
-      }));
+      // Set the mock implementations
+      (useDiveSiteIsLoading as jest.Mock).mockReturnValue(true);
+      (useDiveSiteActions as jest.Mock).mockReturnValue({ loadDiveSites: jest.fn() });
     });
 
     it('should display a loading indicator', () => {
