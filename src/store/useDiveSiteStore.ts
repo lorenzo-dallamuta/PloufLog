@@ -62,11 +62,13 @@ export const createDiveSiteStore = ({ dataStore }: StoreDependencies) => create<
   },
 }));
 
-// Default store instance for app usage
-export const useDiveSiteStore = createDiveSiteStore({
+// Default store instance for app usage, do not export
+const useDiveSiteStore = createDiveSiteStore({
   dataStore: new AsyncStorageDataStore() // <-- The magic abstraction line
 });
 
 // Export convenient hooks for selecting state and actions
-export const useDiveSites = () => useDiveSiteStore(state => state.diveSites);
+export const useDiveSiteList = () => useDiveSiteStore(state => state.diveSites);
+export const useDiveSiteDetails = () => useDiveSiteStore(state => state.diveSite);
+export const useDiveSiteIsLoading = () => useDiveSiteStore(state => state.isLoading);
 export const useDiveSiteActions = () => useDiveSiteStore(state => state.actions);
