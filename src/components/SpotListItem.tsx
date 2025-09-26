@@ -7,8 +7,10 @@ export default function SpotListItem({ item }: { item: DiveSite }) {
     <View
       testID='dive-spot-item'
       style={styles.container}
-      >
-      <Text style={styles.title}>Spot List Item - Coming Soon</Text>
+    >
+      <Text style={styles.title}>{item.data.properties.name}</Text>
+      <Text>{item.data.properties.country_iso3}</Text>
+      <Text>{item.data.properties.averageRating}</Text>
     </View>
   );
 }
