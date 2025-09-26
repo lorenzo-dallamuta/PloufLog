@@ -2,6 +2,7 @@ import { ActivityIndicator, FlatList, StyleSheet } from 'react-native';
 
 import { Text, View } from '@/src/components/Themed';
 import { useDiveSiteIsLoading, useDiveSiteList } from '@/src/store/useDiveSiteStore';
+import SpotListItem from '@/src/components/SpotListItem';
 
 export default function SpotListScreen() {
   const diveSiteList = useDiveSiteList();
@@ -38,12 +39,7 @@ export default function SpotListScreen() {
       <FlatList 
         data={diveSiteList}
         renderItem={({item}) => (
-          <Text
-            testID='dive-spot-item'
-            style={styles.title}
-          >
-            {item.data.properties.id}
-          </Text>
+          <SpotListItem />
         )}
         keyExtractor={item => item.data.properties.id}
         accessible
