@@ -19,6 +19,7 @@
     "@expo/vector-icons": "^14.1.0",
     "@react-native-async-storage/async-storage": "2.1.2",
     "@react-navigation/native": "^7.1.6",
+    "country-iso-3-to-2": "^1.1.1",
     "expo": "~53.0.22",
     "expo-constants": "~17.1.7",
     "expo-dev-client": "~5.2.4",
