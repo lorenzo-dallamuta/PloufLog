@@ -1,6 +1,7 @@
 import { StyleSheet } from 'react-native';
 
 import { Text, View } from '@/src/components/Themed';
+import { getCountryName } from '../utils/getCountryName';
 
 export default function SpotListItem({ item }: { item: DiveSite }) {
   return (
@@ -9,8 +10,10 @@ export default function SpotListItem({ item }: { item: DiveSite }) {
       style={styles.container}
     >
       <Text style={styles.title}>{item.data.properties.name}</Text>
-      <Text>{item.data.properties.country_iso3}</Text>
-      <Text>{item.data.properties.averageRating}</Text>
+      <Text>{getCountryName(item.data.properties.country_iso3)}</Text>
+      <Text accessibilityLabel={`Rating: ${item.data.properties.averageRating} out of 5 stars`}>
+        {item.data.properties.averageRating}⭐
+      </Text>
     </View>
   );
 }
