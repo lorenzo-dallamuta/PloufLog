@@ -2,7 +2,7 @@ import { StyleSheet } from 'react-native';
 
 import { Text, View } from '@/src/components/Themed';
 
-export default function SpotListItem() {
+export default function SpotListItem({ item }: { item: DiveSite }) {
   return (
     <View
       testID='dive-spot-item'

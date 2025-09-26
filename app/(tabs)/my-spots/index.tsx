@@ -39,7 +39,7 @@ export default function SpotListScreen() {
       <FlatList 
         data={diveSiteList}
         renderItem={({item}) => (
-          <SpotListItem />
+          <SpotListItem item={item}/>
         )}
         keyExtractor={item => item.data.properties.id}
         accessible
