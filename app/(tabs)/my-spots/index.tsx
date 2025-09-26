@@ -1,4 +1,4 @@
-import { ActivityIndicator, StyleSheet } from 'react-native';
+import { ActivityIndicator, FlatList, StyleSheet } from 'react-native';
 
 import { Text, View } from '@/src/components/Themed';
 import { useDiveSiteIsLoading, useDiveSiteList } from '@/src/store/useDiveSiteStore';
@@ -35,7 +35,21 @@ export default function SpotListScreen() {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>My Spots List - Coming Soon</Text>
+      <FlatList 
+        data={diveSiteList}
+        renderItem={({item}) => (
+          <Text
+            testID='dive-spot-item'
+            style={styles.title}
+          >
+            {item.data.properties.id}
+          </Text>
+        )}
+        keyExtractor={item => item.data.properties.id}
+        accessible
+        accessibilityLabel={`My dive spots, ${diveSiteList.length} items`}
+        role='list'
+      />
     </View>
   );
 };
