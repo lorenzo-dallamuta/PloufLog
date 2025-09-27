@@ -7,6 +7,9 @@ export default function SpotListItem({ item }: { item: DiveSite }) {
   return (
     <View
       testID='dive-spot-item'
+      accessible
+      accessibilityRole='button'
+      accessibilityLabel={item.data.properties.name}
       style={styles.container}
     >
       <Text style={styles.title}>{item.data.properties.name}</Text>
