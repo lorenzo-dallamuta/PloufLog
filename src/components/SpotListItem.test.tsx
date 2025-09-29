@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react-native';
+import { render, screen } from 'expo-router/testing-library';
 import SpotListItem from '@/src/components/SpotListItem';
 import { getCountryName } from '@/src/utils/getCountryName';
 

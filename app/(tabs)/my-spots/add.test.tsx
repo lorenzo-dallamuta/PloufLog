@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react-native';
+import { render, screen } from 'expo-router/testing-library';
 import AddSpotScreen from './add';
 
 describe('MySpots - Add', () => {

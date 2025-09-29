@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react-native';
+import { render, screen } from 'expo-router/testing-library';
 
 // mock the return values of the store selectors, used in the UI components
 jest.mock('@/src/store/useDiveSiteStore', () => ({
