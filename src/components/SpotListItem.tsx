@@ -1,15 +1,23 @@
-import { StyleSheet } from 'react-native';
+import { Pressable, StyleSheet } from 'react-native';
+import { useRouter } from 'expo-router';
 
-import { Text, View } from '@/src/components/Themed';
+import { Text } from '@/src/components/Themed';
 import { getCountryName } from '../utils/getCountryName';
 
 export default function SpotListItem({ item }: { item: DiveSite }) {
+  const router = useRouter()
+
   return (
-    <View
+    <Pressable
       testID='dive-spot-item'
+      role='button'
       accessible
       accessibilityRole='button'
-      accessibilityLabel={item.data.properties.name}
+      accessibilityLabel={`${item.data.properties.name}, tap to view details.`}
+      onPress={() => router.push({
+        pathname: '/(tabs)/my-spots/[id]', 
+        params: { id: item.data.properties.id }
+      })}
       style={styles.container}
     >
       <Text style={styles.title}>{item.data.properties.name}</Text>
@@ -17,7 +25,7 @@ export default function SpotListItem({ item }: { item: DiveSite }) {
       <Text accessibilityLabel={`Rating: ${item.data.properties.averageRating} out of 5 stars`}>
         {item.data.properties.averageRating}⭐
       </Text>
-    </View>
+    </Pressable>
   );
 }
 
