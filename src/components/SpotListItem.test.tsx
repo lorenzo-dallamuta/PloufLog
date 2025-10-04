@@ -43,7 +43,7 @@ describe('MySpots - SpotListItem', () => {
 
   it('renders the intended accessibility attributes', () => {
     render(<SpotListItem item={mockDiveSite} />);
-    const component = screen.getByTestId('dive-spot-item');
+    const component = screen.getByRole('button');
     expect(component).toBeVisible();
     expect(component).toHaveProp('accessibilityRole', 'button');
     expect(component).toHaveProp(
