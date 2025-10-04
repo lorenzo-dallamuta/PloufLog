@@ -62,4 +62,37 @@ describe('MySpots - SpotListItem', () => {
     
     expect(screen).toHavePathname(`/my-spots/${mockDiveSite.data.properties.id}`);
   });
+
+  it('toggles a delete button if swiped', () => {
+    // to simplify testing, the implentation uses the deprecated 
+    // <Swipeable /> rather then <ReanimatedSwipeable />, as 
+    // ReanimatedSwipeable encapsulates gesture handlers that run 
+    // in the UI thread which is not avilable in Jest with node.js
+    //
+    // for this same reason the test doesn't use the new V2's 
+    // fireGestureHandler or getByGestureTestId
+
+    render(<SpotListItem item={mockDiveSite} />);
+
+    const swipeable = screen.getByTestId('dive-spot-item');
+
+    // check initial state
+    const deleteButton = screen.queryByTestId('delete-button');
+    expect(deleteButton).toBeFalsy();
+    
+    // set the swipeable in the active state
+    fireEvent(swipeable, 'onSwipeableOpen'); 
+    
+    // check the active state
+    const deleteButton2 = screen.queryByTestId('delete-button');
+    expect(deleteButton2).toBeTruthy();
+    expect(deleteButton2).toHaveTextContent('Delete');
+
+    // set the swipeable in the inactive state
+    fireEvent(swipeable, 'onSwipeableClose'); 
+    
+    // check the inactive state
+    const deleteButton3 = screen.queryByTestId('delete-button');
+    expect(deleteButton3).toBeFalsy();
+  });
 });
