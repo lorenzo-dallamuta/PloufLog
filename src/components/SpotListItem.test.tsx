@@ -1,4 +1,5 @@
-import { render, screen } from 'expo-router/testing-library';
+import { fireEvent, render, renderRouter, screen } from 'expo-router/testing-library';
+import { View } from '@/src/components/Themed';
 import SpotListItem from '@/src/components/SpotListItem';
 import { getCountryName } from '@/src/utils/getCountryName';
 
@@ -40,11 +41,25 @@ describe('MySpots - SpotListItem', () => {
   //   expect(screen.getByText(mockDiveSite.data.properties.wildlife)).toBeTruthy();
   // });
 
-  it('displays the dive average rating', () => {
+  it('renders the intended accessibility attributes', () => {
     render(<SpotListItem item={mockDiveSite} />);
     const component = screen.getByTestId('dive-spot-item');
     expect(component).toBeVisible();
     expect(component).toHaveProp('accessibilityRole', 'button');
-    expect(component).toHaveProp('accessibilityLabel', mockDiveSite.data.properties.name);
+    expect(component).toHaveProp(
+      'accessibilityLabel',
+      `${mockDiveSite.data.properties.name}, tap to view details.`
+    );
+  });
+
+  it('navigates when interacted with a tap', () => {
+    renderRouter({
+      index: jest.fn(() => <SpotListItem item={mockDiveSite} />),
+      '(tabs)/my-spots/[id]': jest.fn(() => <View />)
+    });
+    
+    fireEvent.press(screen.getByRole('button'));
+    
+    expect(screen).toHavePathname(`/my-spots/${mockDiveSite.data.properties.id}`);
   });
 });
