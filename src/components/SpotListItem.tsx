@@ -1,7 +1,7 @@
-import { useState } from 'react';
 import { Pressable, StyleSheet } from 'react-native';
 import { useRouter } from 'expo-router';
-import { GestureHandlerRootView, Swipeable } from 'react-native-gesture-handler';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import Swipeable from 'react-native-gesture-handler/ReanimatedSwipeable';
 
 import { Text, View } from '@/src/components/Themed';
 import { getCountryName } from '@/src/utils/getCountryName';
@@ -9,15 +9,16 @@ import { getCountryName } from '@/src/utils/getCountryName';
 export default function SpotListItem({ item }: { item: DiveSite }) {
   const router = useRouter()
 
-  const [showDeleteButton, setShowDeleteButton] = useState(false);
-
   return (
     <View>
       <GestureHandlerRootView>
         <Swipeable 
           testID='dive-spot-item'
-          onSwipeableOpen={() => setShowDeleteButton(true)}
-          onSwipeableClose={() => setShowDeleteButton(false)}
+          renderRightActions={() => (
+            <Pressable testID='delete-button'>
+              <Text>Delete</Text>
+            </Pressable>
+          )}
         >
           <Pressable
             role='button'
@@ -38,11 +39,6 @@ export default function SpotListItem({ item }: { item: DiveSite }) {
           </Pressable>
         </Swipeable>
       </GestureHandlerRootView>
-      {showDeleteButton && (
-        <Pressable testID='delete-button'>
-          <Text>Delete</Text>
-        </Pressable>
-      )}
     </View>
 
   );
