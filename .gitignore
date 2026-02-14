@@ -1,41 +1,21 @@
-# Learn more https://docs.github.com/en/get-started/getting-started-with-git/ignoring-files
+# Root-level build artifacts and temporary files
+build/
 
-# dependencies
-node_modules/
+# General Log files
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
 
-# Expo
-.expo/
-dist/
-web-build/
-expo-env.d.ts
-android/
-
-# Native
-.kotlin/
-*.orig.*
-*.jks
-*.p8
-*.p12
-*.key
-*.mobileprovision
-
-# Metro
-.metro-health-check*
-
-# debug
-npm-debug.*
-yarn-debug.*
-yarn-error.*
-
-# macOS
-.DS_Store
+# Confidential and environment files
+.env*
+!.env.example # Keep example env file if you have one
 *.pem
+firebase-key.json
 
-# local env files
-.env*.local
+# OS and IDE specific temporary files
+.DS_Store
 
-# typescript
-*.tsbuildinfo
-
-# build packages
-*.apk
+# AI Tooling
+.claude

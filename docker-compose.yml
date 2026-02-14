@@ -1,0 +1,102 @@
+services:
+  ssh-agent:
+    build:
+      context: ./docker/ssh-agent
+      dockerfile: Dockerfile
+    container_name: plouflog_ssh_agent
+    volumes:
+      - "${SSH_AUTH_SOCK}:/ssh_auth_sock"
+    environment:
+      SSH_AUTH_SOCK: /ssh_auth_sock
+
+  firebase-emulators:
+    build:
+      context: .
+      dockerfile: docker/firebase-emulator/Dockerfile
+    container_name: plouflog_firebase_emulators
+    ports:
+      - "4000:4000" # Emulator UI
+      - "8080:8080" # Firestore
+      - "9099:9099" # Authentication
+      - "5001:5001" # Cloud Functions
+      - "4400:4400" # Emulator Hub
+    volumes:
+      # This will make firebase.json, .firebaserc, firestore.rules, etc. available at /app
+      - .:/app
+      # This mount for functions_node_modules will overlay /app/functions/node_modules
+      # from the previous mount, ensuring it's the named volume that's used for node_modules.
+      - functions_node_modules:/app/functions/node_modules
+      # This ensures compiled JS is container-managed and cached.
+      # It explicitly hides /app/functions/lib from the host.
+      - functions_lib_cache:/app/functions/lib
+      # Health check dependencies cached
+      - health_check_node_modules:/app/health-check/node_modules
+      # Your existing specific file mounts:
+      - ${FIREBASE_KEY_PATH}:/app/firebase-key.json:ro
+      # Emulator cache volume:
+      - firebase_emulator_cache:/root/.cache/firebase/emulators
+      # SSH Agent forwarding for this container
+      - "${SSH_AUTH_SOCK}:/tmp/ssh_auth_sock"
+    environment:
+      SSH_AUTH_SOCK: /tmp/ssh_auth_sock # Ensure SSH_AUTH_SOCK is set for Git
+      GOOGLE_APPLICATION_CREDENTIALS: /app/firebase-key.json
+      FIREBASE_PROJECT: ${FIREBASE_PROJECT}
+      FIRESTORE_EMULATOR_HOST: localhost:8080
+    depends_on:
+      - ssh-agent
+    command: >
+      sh -c "
+        cd /app/functions &&
+        npm install --prefer-offline --no-audit || npm install &&
+        npm run build &&
+        cd /app/health-check &&
+        npm install --prefer-offline --no-audit || npm install &&
+        npm run build &&
+        cd /app &&
+        firebase emulators:start
+      "
+    healthcheck:
+      test: ["CMD", "node", "/app/health-check/dist/index.js"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 90s
+
+  rn-app:
+    build:
+      context: .
+      dockerfile: docker/rn-app/Dockerfile
+    container_name: plouflog_app
+    ports:
+      - "8081:8081" # Metro bundler
+      - "19000:19000" # Expo Dev Tools
+      - "19001:19001" # Expo iOS
+      - "19002:19002" # Expo Android
+    volumes:
+      - .:/app
+      - rn_node_modules:/app/rn-app/node_modules
+      - type: bind
+        source: ${SSH_AUTH_SOCK}
+        target: /tmp/ssh_auth_sock
+    depends_on:
+      - firebase-emulators
+      - ssh-agent
+    environment:
+      SSH_AUTH_SOCK: /tmp/ssh_auth_sock
+      EXPO_DEVTOOLS_LISTEN_ADDRESS: "0.0.0.0"
+      REACT_NATIVE_PACKAGER_HOSTNAME: "localhost"
+    command: >
+      sh -c "
+        mkdir -p /app/rn-app/node_modules &&
+        chown -R node:node /app/rn-app/node_modules || true &&
+        cd /app/rn-app &&
+        su -s /bin/sh node -c 'npm install' &&
+        su -s /bin/sh node -c 'npm start'
+      "
+
+volumes:
+  firebase_emulator_cache:
+  functions_node_modules:
+  functions_lib_cache:
+  health_check_node_modules:
+  rn_node_modules:
