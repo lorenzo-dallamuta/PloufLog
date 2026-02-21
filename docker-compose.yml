@@ -71,7 +71,6 @@ services:
             exec firebase emulators:start --import emulator-data-export/latest --export-on-exit emulator-data-export/latest
           fi
         fi
-        fi
       "
     healthcheck:
       test: ["CMD", "node", "/app/packages/health-check/dist/index.js"]
