@@ -18,6 +18,7 @@ services:
       - "4000:4000" # Emulator UI
       - "8080:8080" # Firestore
       - "9099:9099" # Authentication
+      - "9199:9199" # Cloud Storage
       - "5001:5001" # Cloud Functions
       - "4400:4400" # Emulator Hub
     volumes:
@@ -91,13 +92,16 @@ services:
       - .:/app
       - seeding_node_modules:/app/packages/seeding/node_modules
       - ${SEED_DATA_HOST_PATH:-../../scraping/scubago/scubago_data}:/app/data:ro
+      - ${SEED_ASSETS_HOST_PATH:-../../scraping/scubago/scubago_assets}:/app/assets:ro
       - pnpm_store:/root/.local/share/pnpm
     environment:
       # Connect to the sibling container 'firebase-emulators' on port 8080
       FIRESTORE_EMULATOR_HOST: firebase-emulators:8080
+      FIREBASE_STORAGE_EMULATOR_HOST: firebase-emulators:9199
       # GOOGLE_APPLICATION_CREDENTIALS: /app/firebase-key.json
       FIREBASE_PROJECT: ${FIREBASE_PROJECT}
       SEED_DATA_PATH: ${SEED_DATA_DIR:-/app/data/wildlife_final.json}
+      SEED_ASSETS_DIR: /app/assets
     depends_on:
       firebase-emulators:
         condition: service_healthy

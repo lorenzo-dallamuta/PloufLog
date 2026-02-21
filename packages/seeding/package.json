@@ -3,13 +3,18 @@
   "version": "1.0.0",
   "description": "Database seeding scripts for PloufLog",
   "scripts": {
-    "seed:wildlife": "ts-node seedWildlife.ts"
+    "seed:wildlife": "ts-node seedWildlife.ts",
+    "seed:images": "ts-node seedWildlifeImages.ts"
   },
   "dependencies": {
+    "axios": "^1.7.9",
     "firebase-admin": "catalog:",
-    "fs-extra": "catalog:"
+    "fs-extra": "catalog:",
+    "mime-types": "^2.1.35",
+    "p-limit": "^3.1.0"
   },
   "devDependencies": {
+    "@types/mime-types": "^2.1.4",
     "@types/node": "catalog:",
     "@types/fs-extra": "^11.0.0",
     "ts-node": "^10.9.2",
