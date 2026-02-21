@@ -1,0 +1,20 @@
+{
+  "name": "plouflog-monorepo",
+  "version": "1.0.0",
+  "private": true,
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "start:mobile": "cd apps/mobile && npm run start",
+    "test:mobile": "cd apps/mobile && npm run test",
+    "seed:wildlife": "cd packages/seeding && npm run seed:wildlife"
+  },
+  "dependencies": {
+    "firebase": "^11.0.1"
+  },
+  "devDependencies": {
+    "typescript": "^5.0.0"
+  }
+}

@@ -7,9 +7,9 @@ import Constants from 'expo-constants';
 // Firebase configuration
 const firebaseConfig = {
   apiKey: "AIzaSyDummy-Key-For-Emulator-Development",
-  authDomain: "plouflog-dev.firebaseapp.com",
-  projectId: "plouflog-dev",
-  storageBucket: "plouflog-dev.appspot.com",
+  authDomain: "demo-plouflog-dev.firebaseapp.com",
+  projectId: "demo-plouflog-dev",
+  storageBucket: "demo-plouflog-dev.appspot.com",
   messagingSenderId: "123456789",
   appId: "1:123456789:web:abcdef",
 };

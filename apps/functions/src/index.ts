@@ -28,6 +28,8 @@ import * as logger from "firebase-functions/logger";
 
 setGlobalOptions({ maxInstances: 10 });
 
+// TODO: Delete this helloWorld placeholder function as soon as a real function is implemented.
+// It was previously used for health checks but is no longer needed.
 export const helloWorld = onRequest((request, response) => {
   logger.info("Hello logs!", { structuredData: true });
   response.json({ data: "Hello from Firebase!" });

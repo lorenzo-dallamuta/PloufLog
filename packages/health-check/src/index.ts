@@ -145,8 +145,9 @@ class HealthChecker {
 
     try {
       if (this.isEmulatorMode) {
-        // Check emulator endpoint and try calling helloWorld function
-        const functionUrl = `http://localhost:5001/${this.projectId}/us-central1/helloWorld`;
+        // Ping the root emulator endpoint instead of helloWorld
+        // This avoids polluting emulator logs with function executions every 30s
+        const functionUrl = `http://localhost:5001/`;
         const response = await fetch(functionUrl, {
           method: 'GET',
           timeout: 5000,
@@ -154,20 +155,12 @@ class HealthChecker {
 
         const latency = Date.now() - startTime;
 
-        if (response.ok) {
-          const data = await response.json();
+        // As long as the connection succeeds, the emulator is listening
+        if (response.status < 500) {
           return {
             service: 'Functions',
             status: 'healthy',
-            message: 'Emulator is running and helloWorld responded',
-            latency,
-          };
-        } else if (response.status === 404) {
-          // Functions emulator is running but helloWorld might not be deployed yet
-          return {
-            service: 'Functions',
-            status: 'healthy',
-            message: 'Emulator is running (helloWorld not found - may need deployment)',
+            message: 'Emulator is listening on port 5001',
             latency,
           };
         } else {
