@@ -59,17 +59,18 @@ services:
         pnpm install --filter plouflog-health-check... &&
         pnpm run build &&
         cd /app &&
-        mkdir -p emulator-data-export &&
-        if [ \"$$WIPE_EMULATOR_DATA\" = \"true\" ]; then
+        mkdir -p emulator-data-export/latest &&
+        if [ "$$WIPE_EMULATOR_DATA" = "true" ]; then
           echo 'Wiping emulator data...' &&
-          rm -rf emulator-data-export/* &&
-          exec firebase emulators:start --export-on-exit emulator-data-export
+          rm -rf emulator-data-export/latest/* &&
+          exec firebase emulators:start --export-on-exit emulator-data-export/latest
         else
-          if [ -z \"$$(ls -A emulator-data-export 2>/dev/null)\" ]; then
-            exec firebase emulators:start --export-on-exit emulator-data-export
+          if [ -z "$$(ls -A emulator-data-export/latest 2>/dev/null)" ]; then
+            exec firebase emulators:start --export-on-exit emulator-data-export/latest
           else
-            exec firebase emulators:start --import emulator-data-export --export-on-exit emulator-data-export
+            exec firebase emulators:start --import emulator-data-export/latest --export-on-exit emulator-data-export/latest
           fi
+        fi
         fi
       "
     healthcheck:
