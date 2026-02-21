@@ -45,9 +45,18 @@ The goal is to populate the PloufLog Firestore database with high-quality data w
 
 ### 3. Injection Layer (Seeder)
 **Location:** `packages/seeding/`
-- **Purpose:** Push the "Golden Master" data into Firestore reliably.
-- **Mechanism:** Uses a `BatchSeeder` controller to chunk data into Firestore's 500-item batch limits.
+- **Purpose:** Push the "Golden Master" data into Firestore and Firebase Storage reliably.
+- **Mechanism:** 
+    - **Firestore:** Uses a `BatchSeeder` controller to chunk data into Firestore's 500-item batch limits.
+    - **Storage (Images):** Uses a hybrid `ImageUploader` that carries images from the "Loading Dock" (local assets folder) into the "Warehouse" (Firebase Storage). 
+- **Loading Dock Concept:** We mount the host's scraped assets folder (e.g. `scubago_assets`) into the seeder container. This allows high-speed, offline seeding. If a local file is missing, the seeder automatically falls back to downloading from the original source URL.
 - **Execution:** Runs via Docker (`docker compose run --rm seeding`). Uses `firebase-admin` to bypass security rules and safely `merge` data idempotently (can be run multiple times safely).
+
+## Testing Strategy
+PloufLog adopts a pragmatic testing approach focused on stability and visual consistency:
+- **Spot Testing**: Unit and integration tests are applied selectively to "weak links" or complex logic rather than full coverage. This ensures critical paths are stable without the overhead of TDD for every component.
+- **Visual Regression**: UI consistency is maintained through visual regression tests using **Chromatic** and **Storybook**. This allows for quick validation of UI changes across the application.
+- **Manual Verification**: Rapid prototyping and manual data entry via the Emulator UI are used for high-level validation of the "Open Schema" implementation.
 
 ## Docker Orchestration & Emulators
 The local development environment is orchestrated via `docker-compose.yml`:

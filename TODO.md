@@ -10,3 +10,9 @@ This file tracks technical debt, temporary workarounds, and pending architectura
 ## Data Pipeline
 
 - [ ] **Image Optimization**: The current scraped images are stored in their raw (lossy) format. We need to implement an optimization pipeline (using `sharp`) to resize and convert them to modern formats (WebP/AVIF). **Important:** The original downloaded assets must be preserved untouched; optimizations should be generated as separate artifacts.
+
+## Testing & Quality
+
+- [ ] **Spot Testing**: Identify critical "weak links" in the logic (e.g., data transformation, store logic) and implement targeted tests.
+- [ ] **Storybook & Chromatic**: Set up Storybook for UI component development and Chromatic for visual regression testing.
+- [ ] **CI/CD Pipeline**: Integrate linting, type-checking, and automated spot tests into a CI workflow.
