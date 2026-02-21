@@ -1,0 +1,69 @@
+Project PloufLog {
+  database_type: 'Firestore'
+  Note: 'Wildlife-First Data Model v3'
+}
+
+// COLLECTION: wildlife
+// Path: /wildlife/{id}
+Table wildlife {
+  // Primary Key
+  // Scubago items -> "44" (Stringified integer)
+  // Manual items  -> "staghorn-coral" (Slug)
+  id string [pk]
+  
+  // Core Info
+  slug string [unique]
+  name string
+  
+  // Origin Tracking
+  // Filters "My Data" vs "Imported Data"
+  source string [note: "'scubago' | 'manual' | 'external'"]
+
+  // Classification
+  // Nullable array for hierarchical classification queries
+  taxonomy array [null, note: "e.g. ['Animalia', 'Mollusca']"]
+  
+  // Extra Metadata
+  species_count int [note: "Extracted from Scubago Category Info"]
+
+  // CONTENT (The "Accordion" Data)
+  // Polymorphic list of content blocks.
+  content array [note: "List of ContentBlock objects"]
+  // ContentBlock Structure:
+  // {
+  //   "title": "Overview",
+  //   "body": "Markdown text...",
+  //   "source": "scubago"
+  // }
+
+  // IMAGES
+  // Hosted on Plouflog Storage
+  images array [note: "List of Image objects"]
+  // Image Object:
+  // {
+  //   "storage_path": "wildlife/44/main.jpg",
+  //   "url": "https://...", 
+  //   "credit": "AdobeStock",
+  //   "caption": "...",
+  //   "source": "scubago"
+  // }
+
+  // METADATA
+  keywords array
+  created_at timestamp
+  updated_at timestamp
+}
+
+// COLLECTION: divesites
+// Path: /divesites/{id}
+Table divesites {
+  id string [pk]
+  name string
+  
+  // RELATIONSHIP: Wildlife Sightings
+  // Embedded summary map
+  wildlife_sightings json [note: "Map<WildlifeID, SightingSummary>"]
+}
+
+// Logical Relationship
+Ref: divesites.wildlife_sightings > wildlife.id
