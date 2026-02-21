@@ -65,9 +65,11 @@ services:
           rm -rf emulator-data-export/latest/* &&
           exec firebase emulators:start --export-on-exit emulator-data-export/latest
         else
-          if [ -z "$$(ls -A emulator-data-export/latest 2>/dev/null)" ]; then
+          if [ ! -f emulator-data-export/latest/firebase-export-metadata.json ]; then
+            echo 'No existing emulator data found. Starting fresh...'
             exec firebase emulators:start --export-on-exit emulator-data-export/latest
           else
+            echo 'Found existing emulator data. Importing...'
             exec firebase emulators:start --import emulator-data-export/latest --export-on-exit emulator-data-export/latest
           fi
         fi
