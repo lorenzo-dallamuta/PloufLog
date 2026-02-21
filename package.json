@@ -11,9 +11,7 @@
     "test:mobile": "cd apps/mobile && npm run test",
     "seed:wildlife": "cd packages/seeding && npm run seed:wildlife"
   },
-  "dependencies": {
-    "firebase": "^11.0.1"
-  },
+  "dependencies": {},
   "pnpm": {
     "onlyBuiltDependencies": [
       "@firebase/util",

@@ -6,13 +6,13 @@
     "seed:wildlife": "ts-node seedWildlife.ts"
   },
   "dependencies": {
-    "firebase-admin": "^12.0.0",
-    "fs-extra": "^11.2.0"
+    "firebase-admin": "catalog:",
+    "fs-extra": "catalog:"
   },
   "devDependencies": {
-    "@types/node": "^20.0.0",
+    "@types/node": "catalog:",
     "@types/fs-extra": "^11.0.0",
     "ts-node": "^10.9.2",
-    "typescript": "^5.0.0"
+    "typescript": "catalog:"
   }
 }
