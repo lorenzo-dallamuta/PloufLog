@@ -1,5 +1,10 @@
 # Root-level build artifacts and temporary files
 build/
+dist/
+
+# Dependencies
+node_modules/
+.pnpm-store/
 
 # General Log files
 *.log
@@ -10,12 +15,25 @@ yarn-error.log*
 
 # Confidential and environment files
 .env*
-!.env.example # Keep example env file if you have one
+!.env.example
 *.pem
 firebase-key.json
 
 # OS and IDE specific temporary files
 .DS_Store
+.idea/
+.vscode/
 
 # AI Tooling
 .claude
+
+# Expo
+.expo/
+web-build/
+
+# Firebase
+.firebase/
+firebase-debug.log
+firestore-debug.log
+ui-debug.log
+emulator-data/
