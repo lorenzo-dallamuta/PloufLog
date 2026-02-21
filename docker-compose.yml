@@ -23,44 +23,88 @@ services:
     volumes:
       # This will make firebase.json, .firebaserc, firestore.rules, etc. available at /app
       - .:/app
+      # Workaround for Firebase Emulator EBUSY on export when using bind mounts
+      - firebase_emulator_export:/app/emulator-data-export
       # This mount for functions_node_modules will overlay /app/functions/node_modules
       # from the previous mount, ensuring it's the named volume that's used for node_modules.
-      - functions_node_modules:/app/functions/node_modules
+      - functions_node_modules:/app/apps/functions/node_modules
       # This ensures compiled JS is container-managed and cached.
-      # It explicitly hides /app/functions/lib from the host.
-      - functions_lib_cache:/app/functions/lib
+      # It explicitly hides /app/apps/functions/lib from the host.
+      - functions_lib_cache:/app/apps/functions/lib
       # Health check dependencies cached
-      - health_check_node_modules:/app/health-check/node_modules
+      - health_check_node_modules:/app/packages/health-check/node_modules
       # Your existing specific file mounts:
       - ${FIREBASE_KEY_PATH}:/app/firebase-key.json:ro
       # Emulator cache volume:
       - firebase_emulator_cache:/root/.cache/firebase/emulators
       # SSH Agent forwarding for this container
       - "${SSH_AUTH_SOCK}:/tmp/ssh_auth_sock"
+      # PNPM Store
+      - pnpm_store:/root/.local/share/pnpm
     environment:
       SSH_AUTH_SOCK: /tmp/ssh_auth_sock # Ensure SSH_AUTH_SOCK is set for Git
       GOOGLE_APPLICATION_CREDENTIALS: /app/firebase-key.json
       FIREBASE_PROJECT: ${FIREBASE_PROJECT}
       FIRESTORE_EMULATOR_HOST: localhost:8080
+      WIPE_EMULATOR_DATA: ${WIPE_EMULATOR_DATA:-false}
     depends_on:
       - ssh-agent
+    stop_grace_period: 30s
     command: >
       sh -c "
-        cd /app/functions &&
-        npm install --prefer-offline --no-audit || npm install &&
-        npm run build &&
-        cd /app/health-check &&
-        npm install --prefer-offline --no-audit || npm install &&
-        npm run build &&
+        cd /app/apps/functions &&
+        pnpm install --filter plouflog-functions... &&
+        pnpm run build &&
+        cd /app/packages/health-check &&
+        pnpm install --filter plouflog-health-check... &&
+        pnpm run build &&
         cd /app &&
-        firebase emulators:start
+        mkdir -p emulator-data-export &&
+        if [ \"$$WIPE_EMULATOR_DATA\" = \"true\" ]; then
+          echo 'Wiping emulator data...' &&
+          rm -rf emulator-data-export/* &&
+          exec firebase emulators:start --export-on-exit emulator-data-export
+        else
+          if [ -z \"$$(ls -A emulator-data-export 2>/dev/null)\" ]; then
+            exec firebase emulators:start --export-on-exit emulator-data-export
+          else
+            exec firebase emulators:start --import emulator-data-export --export-on-exit emulator-data-export
+          fi
+        fi
       "
     healthcheck:
-      test: ["CMD", "node", "/app/health-check/dist/index.js"]
+      test: ["CMD", "node", "/app/packages/health-check/dist/index.js"]
       interval: 30s
       timeout: 10s
       retries: 3
       start_period: 90s
+
+  seeding:
+    build:
+      context: .
+      dockerfile: docker/firebase-emulator/Dockerfile
+    container_name: plouflog_seeding
+    profiles: ["tools"]
+    volumes:
+      - .:/app
+      - seeding_node_modules:/app/packages/seeding/node_modules
+      - ${SEED_DATA_HOST_PATH:-../../scraping/scubago/scubago_data}:/app/data:ro
+      - pnpm_store:/root/.local/share/pnpm
+    environment:
+      # Connect to the sibling container 'firebase-emulators' on port 8080
+      FIRESTORE_EMULATOR_HOST: firebase-emulators:8080
+      # GOOGLE_APPLICATION_CREDENTIALS: /app/firebase-key.json
+      FIREBASE_PROJECT: ${FIREBASE_PROJECT}
+      SEED_DATA_PATH: ${SEED_DATA_DIR:-/app/data/wildlife_final.json}
+    depends_on:
+      firebase-emulators:
+        condition: service_healthy
+    command: >
+      sh -c "
+        cd /app/packages/seeding &&
+        pnpm install &&
+        pnpm run seed:wildlife
+      "
 
   rn-app:
     build:
@@ -74,7 +118,8 @@ services:
       - "19002:19002" # Expo Android
     volumes:
       - .:/app
-      - rn_node_modules:/app/rn-app/node_modules
+      - rn_node_modules:/app/apps/mobile/node_modules
+      - pnpm_store:/home/node/.local/share/pnpm
       - type: bind
         source: ${SSH_AUTH_SOCK}
         target: /tmp/ssh_auth_sock
@@ -87,16 +132,23 @@ services:
       REACT_NATIVE_PACKAGER_HOSTNAME: "localhost"
     command: >
       sh -c "
-        mkdir -p /app/rn-app/node_modules &&
-        chown -R node:node /app/rn-app/node_modules || true &&
-        cd /app/rn-app &&
-        su -s /bin/sh node -c 'npm install' &&
-        su -s /bin/sh node -c 'npm start'
+        mkdir -p /home/node/.local/share/pnpm &&
+        chown -R node:node /home/node/.local/share/pnpm &&
+        mkdir -p /app/node_modules &&
+        chown -R node:node /app/node_modules || true &&
+        mkdir -p /app/apps/mobile/node_modules &&
+        chown -R node:node /app/apps/mobile/node_modules || true &&
+        cd /app/apps/mobile &&
+        su -s /bin/sh node -c 'pnpm install --filter plouflog...' &&
+        su -s /bin/sh node -c 'pnpm start'
       "
 
 volumes:
   firebase_emulator_cache:
+  firebase_emulator_export:
   functions_node_modules:
   functions_lib_cache:
   health_check_node_modules:
   rn_node_modules:
+  seeding_node_modules:
+  pnpm_store:
