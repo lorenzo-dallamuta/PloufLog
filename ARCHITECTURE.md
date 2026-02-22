@@ -58,6 +58,13 @@ PloufLog adopts a pragmatic testing approach focused on stability and visual con
 - **Visual Regression**: UI consistency is maintained through visual regression tests using **Chromatic** and **Storybook**. This allows for quick validation of UI changes across the application.
 - **Manual Verification**: Rapid prototyping and manual data entry via the Emulator UI are used for high-level validation of the "Open Schema" implementation.
 
+## UI & Navigation Strategy
+- **Cross-Platform Layouts**: The application is designed to be responsive. Future iterations will implement distinct layouts for Mobile (Bottom Tabs) and Web (Top/Side Navigation) to better suit the platform's ergonomics.
+- **Data Layer Pattern**: While currently using direct component-level fetching for rapid prototyping, the architectural goal is to move towards a centralized data layer using:
+    - **Firestore Data Converters**: Moving type-casting logic out of components and into the SDK configuration.
+    - **Real-time Listeners (`onSnapshot`)**: Ensuring UI synchronization with the database state.
+    - **Lifecycle Hooks**: Leveraging custom hooks or libraries like TanStack Query/Reactfire for robust state, caching, and error management.
+
 ## Docker Orchestration & Emulators
 The local development environment is orchestrated via `docker-compose.yml`:
 - **`rn-app`**: Runs the Expo Metro bundler.

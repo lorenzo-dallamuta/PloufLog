@@ -20,3 +20,11 @@ This file tracks technical debt, temporary workarounds, and pending architectura
 - [ ] **Spot Testing**: Identify critical "weak links" in the logic (e.g., data transformation, store logic) and implement targeted tests.
 - [ ] **Storybook & Chromatic**: Set up Storybook for UI component development and Chromatic for visual regression testing.
 - [ ] **CI/CD Pipeline**: Integrate linting, type-checking, and automated spot tests into a CI workflow.
+
+## Frontend & Data Layer
+
+- [ ] **Responsive Navigation**: Implement platform-specific layouts (Top bar for Web, Bottom Tabs for Mobile).
+- [ ] **Professional Data Layer**:
+    - [ ] Implement `withConverter` for all Firestore collections.
+    - [ ] Migrate component-level `useEffect` fetches to custom hooks or TanStack Query.
+    - [ ] Implement real-time listeners where UI synchronization is critical.
