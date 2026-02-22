@@ -7,6 +7,10 @@ This file tracks technical debt, temporary workarounds, and pending architectura
 - [ ] **Firestore Security Rules**: Currently, `firestore.rules` is configured as `allow read, write: if true;` for development purposes. This **must** be replaced with proper role-based or user-based security rules before any production deployment.
 - [ ] **Cloud Functions Placeholder**: The `helloWorld` function in `apps/functions/src/index.ts` is a placeholder. It should be deleted as soon as the first real Cloud Function is implemented.
 
+## Docker Infrastructure
+
+- [ ] **Migrate to Non-Root User**: Currently, containers run as `root` to avoid pnpm/volume permission issues. Refactor `Dockerfile`s and `docker-compose.yml` to consistently run as UID 1000 (node) while maintaining shared volume access.
+
 ## Data Pipeline
 
 - [ ] **Image Optimization**: The current scraped images are stored in their raw (lossy) format. We need to implement an optimization pipeline (using `sharp`) to resize and convert them to modern formats (WebP/AVIF). **Important:** The original downloaded assets must be preserved untouched; optimizations should be generated as separate artifacts.

@@ -64,3 +64,8 @@ The local development environment is orchestrated via `docker-compose.yml`:
 - **`firebase-emulators`**: Runs local instances of Firestore, Auth, and Functions. 
     - **Persistence:** Configured to automatically export data on exit and import on startup (via a Docker volume workaround to avoid `EBUSY` locks). This ensures any manual data entry done via the Emulator UI (`localhost:4000`) is safely retained across reboots.
 - **`seeding`**: A transient utility container used strictly for executing the injection scripts against the running emulators.
+
+### Docker & Permissions
+- **Current Strategy (Root):** To avoid permission issues with shared host volumes (bind mounts) in a pnpm monorepo, all development containers (including `rn-app`) run as `root`. This ensures they can all read/write to the shared `node_modules` and `.pnpm` store without conflict.
+- **Future Goal (Non-Root):** Migrate to running all containers as a non-root user (UID 1000) to better match production security practices and keep host file permissions clean. This will require strict alignment of UIDs across all Dockerfiles.
+

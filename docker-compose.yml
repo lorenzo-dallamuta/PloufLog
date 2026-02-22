@@ -125,7 +125,7 @@ services:
     volumes:
       - .:/app
       - rn_node_modules:/app/apps/mobile/node_modules
-      - pnpm_store:/home/node/.local/share/pnpm
+      - pnpm_store:/root/.local/share/pnpm
       - type: bind
         source: ${SSH_AUTH_SOCK}
         target: /tmp/ssh_auth_sock
@@ -138,15 +138,9 @@ services:
       REACT_NATIVE_PACKAGER_HOSTNAME: "localhost"
     command: >
       sh -c "
-        mkdir -p /home/node/.local/share/pnpm &&
-        chown -R node:node /home/node/.local/share/pnpm &&
-        mkdir -p /app/node_modules &&
-        chown -R node:node /app/node_modules || true &&
-        mkdir -p /app/apps/mobile/node_modules &&
-        chown -R node:node /app/apps/mobile/node_modules || true &&
         cd /app/apps/mobile &&
-        su -s /bin/sh node -c 'pnpm install --filter plouflog...' &&
-        su -s /bin/sh node -c 'pnpm start'
+        pnpm install --filter plouflog... &&
+        pnpm start
       "
 
 volumes:
