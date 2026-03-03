@@ -8,16 +8,16 @@
   },
   "dependencies": {
     "axios": "^1.7.9",
-    "firebase-admin": "catalog:",
-    "fs-extra": "catalog:",
+    "firebase-admin": "^13.0.0",
+    "fs-extra": "^11.2.0",
     "mime-types": "^2.1.35",
     "p-limit": "^3.1.0"
   },
   "devDependencies": {
     "@types/mime-types": "^2.1.4",
-    "@types/node": "catalog:",
+    "@types/node": "^22.0.0",
     "@types/fs-extra": "^11.0.0",
     "ts-node": "^10.9.2",
-    "typescript": "catalog:"
+    "typescript": "^5.7.3"
   }
 }

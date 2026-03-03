@@ -34,6 +34,7 @@ export default function TabLayout() {
         name="wildlife"
         options={{
           title: 'Wildlife',
+          headerShown: false,
           tabBarIcon: ({ color }) => <TabBarIcon name="leaf" color={color} />,
         }}
       />

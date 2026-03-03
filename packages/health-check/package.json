@@ -4,19 +4,23 @@
   "description": "Health check for Firebase services (emulator and cloud)",
   "main": "src/index.js",
   "scripts": {
-    "build": "tsc",
+    "build": "npx tsc",
     "check": "node dist/index.js"
   },
-  "keywords": ["firebase", "health-check", "monitoring"],
+  "keywords": [
+    "firebase",
+    "health-check",
+    "monitoring"
+  ],
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "firebase-admin": "catalog:",
+    "firebase-admin": "^13.0.0",
     "node-fetch": "^2.7.0"
   },
   "devDependencies": {
-    "@types/node": "catalog:",
+    "@types/node": "^22.0.0",
     "@types/node-fetch": "^2.6.11",
-    "typescript": "catalog:"
+    "typescript": "^5.9.3"
   }
 }

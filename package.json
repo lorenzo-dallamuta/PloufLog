@@ -7,19 +7,21 @@
     "packages/*"
   ],
   "scripts": {
-    "start:mobile": "cd apps/mobile && npm run start",
-    "test:mobile": "cd apps/mobile && npm run test",
-    "seed:wildlife": "cd packages/seeding && npm run seed:wildlife"
-  },
-  "dependencies": {},
-  "pnpm": {
-    "onlyBuiltDependencies": [
-      "@firebase/util",
-      "protobufjs",
-      "esbuild"
-    ]
+    "start:mobile": "npm run start --workspace=plouflog",
+    "test:mobile": "npm run test --workspace=plouflog",
+    "seed:wildlife": "npm run seed:wildlife --workspace=plouflog-seeding"
   },
   "devDependencies": {
     "typescript": "^5.0.0"
+  },
+  "overrides": {
+    "pretty-format": "29.7.0"
+  },
+  "dependencies": {
+    "@expo/config-plugins": "~8.0.0",
+    "expo": "~53.0.22",
+    "react": "19.2.4",
+    "react-dom": "19.2.4",
+    "react-test-renderer": "19.2.4"
   }
 }
