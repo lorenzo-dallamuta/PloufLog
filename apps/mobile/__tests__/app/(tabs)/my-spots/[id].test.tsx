@@ -1,5 +1,5 @@
 import { render, screen } from 'expo-router/testing-library';
-import SpotDetailsScreen from './[id]';
+import SpotDetailsScreen from '../../../../app/(tabs)/my-spots/[id]';
 
 describe('MySpots - Details', () => {
   it('renders placeholder', () => {

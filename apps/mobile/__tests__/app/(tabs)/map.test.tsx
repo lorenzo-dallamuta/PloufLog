@@ -1,5 +1,5 @@
 import { render, screen } from 'expo-router/testing-library';
-import MapScreen from './map';
+import MapScreen from '../../../app/(tabs)/map';
 
 describe('Map', () => {
   it('renders placeholder', () => {
